@@ -42,6 +42,8 @@ VRRPを利用することで物理的な複数のルータを一つの仮想的�
     - backup.conf
     - start_nginx.sh
     - stop_nginx.sh
+- client
+    - Dockerfile
 - server1
     - Dockerfile
     - index.html
@@ -73,16 +75,15 @@ masterコンテナのロードバランサーがmaster状態で、backupコン�
 ```
 
 ## 演習2
-masterコンテナとbackupコンテナの両方から仮想ipアドレス`192.168.1.100`へcurlコマンドを用いたリクエストを送ってみましょう。
+clientコンテナから仮想ipアドレス`192.168.1.100`へcurlコマンドを用いたリクエストを送ってみましょう。
 `docker desktop`の画面のコンテナにある`Exec`での入力
 または
 ```sh
-docker exec -it vrrp-master-1 bash
+docker exec -it vrrp-client-1 bash
 ```
 で該当のコンテナに入力ができます
 
-- master
-``` master.sh
+``` client.sh
 / # curl 192.168.1.100
 <html>
   <body>
@@ -109,13 +110,7 @@ docker exec -it vrrp-master-1 bash
 </html>
 ```
 
-- backup
-``` backup.sh
-/ # curl 192.168.1.100
-curl: (7) Failed to connect to 192.168.1.100 port 80 after 21066 ms: Could not connect to server
-```
-
-この結果よりmaster状態のmasterコンテナだけがアクティブな状態であることが確認できます
+この結果よりclientからの`curl`リクエストが各サーバにラウンドロビン方式で分散されていることが確認できます
 
 ## 演習3
 masterコンテナを停止させてbackupコンテナがmaster状態に昇格することを確認しましょう
